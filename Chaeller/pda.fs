@@ -27,25 +27,21 @@ let parseExpression input =
                 | '*' -> Operator ('*', (*)) 
                 | '+' -> Operator ('+', (+))
                 | _ -> InvalidInput "Read invalid char"
-                
-    let rec innerParseExpression input output =
-        match input with
-        | [] -> output
-        | x::xs -> innerParseExpression xs ((handleChar x)::output)
-    innerParseExpression (input |> Seq.toList) []
+    input |> Seq.map handleChar |> Seq.toList
 
 let runPda expression report =
     let doOperation sym op stack =
         match stack with
         | a::b::xs ->
             let result = op a b
-            (xs, Value result, [Op sym; Pop a; Pop b; Push result])
+            (xs, Value result, [Op sym; Pop a; Pop b; Display; Push result])
         | xs ->
             (xs, Error "Stack to small or empty", [Display])
         
     let rec innerRunPda expression stack =
         match expression with
         | Number x::xs ->
+            report stack [Push x]
             innerRunPda xs (x::stack)
         | Operator (sym,op)::xs ->
             match (doOperation sym op stack) with
