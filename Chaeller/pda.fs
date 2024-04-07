@@ -31,9 +31,9 @@ let parseExpression input =
 let validateExpression expression =
     let rec innerValidateExpression leftToCheck count errors =
         match leftToCheck with
-        | InvalidInput x::xs ->
+        | InvalidInput _::xs ->
             innerValidateExpression xs (count+1) errors@[count]
-        | x::xs -> 
+        | _::xs -> 
             innerValidateExpression xs (count+1) errors
         | [] -> errors
     innerValidateExpression expression 0 []
@@ -57,7 +57,7 @@ let runPda expression report =
             | (stack, Value result, actions) ->
                 report stack actions
                 innerRunPda xs (result::stack)
-            | (stack, Error msg, actions) ->
+            | (_, Error msg, _) ->
                 Error $"Evaluation Error: {msg}"
         | InvalidInput msg::xs ->
             Error $"Invalid Expression: {msg}"

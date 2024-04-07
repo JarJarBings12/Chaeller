@@ -2,7 +2,6 @@
 
 open pda
 open vis
-open System.Reflection
 
 [<EntryPoint>]
 let main argv =
@@ -13,7 +12,7 @@ let main argv =
         let handler =
             match argv[0] with
             | "step" -> Some displayReport
-            | "nop" -> Some (fun stack actions -> ())
+            | "nop" -> Some (fun _ _ -> ())
             | arg ->
                 printfn "Invalid argument: %s" arg
                 None
@@ -29,11 +28,11 @@ let main argv =
                 | Error e -> 
                     printfn "Failed to evaluate expression:\n%s" e
             | None -> ()   
-        | a ->
+        | errors ->
             printfn "Invalid Expression: %s" argv[1]
             printfn 
                 "                    %s"
-                ((expression.Length::a, 0) 
+                ((expression.Length::errors, 0) 
                 ||>Seq.mapFoldBack (
                     fun state x -> 
                         let res = x - state
