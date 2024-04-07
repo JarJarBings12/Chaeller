@@ -8,7 +8,7 @@ open Spectre.Console
 
 let makeStackFrame label color =
     markup {
-        text $"[{color}][/]{label}"
+        text $"[{color}]{label}[/]"
     } :> IRenderable
 
 let renderStack stack =
