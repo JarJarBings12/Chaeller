@@ -17,17 +17,22 @@ let renderStack stack =
         | value::xs ->
             innerRenderStack xs (makeStackFrame $"~ {value}" "white"::elements)
         | [] -> elements
-    innerRenderStack stack []
+    innerRenderStack stack [] |> List.rev
 
 let renderStackWithChange stack changes =
-    let rec innerRenderChanges changes visDisplay =
+    let rec renderChanges changes visDisplay =
         match changes with
-        | Push v::xs -> innerRenderChanges xs (makeStackFrame $"> {v}" "green"::visDisplay)
-        | Pop v::xs -> innerRenderChanges xs (makeStackFrame $"< {v}" "red"::visDisplay)
-        | Display::xs -> (xs, visDisplay)
-        | _ -> (changes, visDisplay)
-    let stack = renderStack stack
-    innerRenderChanges changes stack
+        | Push v::xs -> 
+            renderChanges xs (makeStackFrame $"> {v}" "green"::visDisplay)
+        | Pop v::xs -> 
+            renderChanges xs (makeStackFrame $"< {v}" "red"::visDisplay)
+        | Display::xs -> 
+            (xs, visDisplay |> List.rev)
+        | _ -> 
+            (changes, visDisplay |> List.rev)
+    let stack = renderStack stack 
+    let (changesLeft, visDisplay) = renderChanges changes []
+    (changesLeft, visDisplay@stack)
 
 let makeBaseGrid left right =
     grid {
@@ -63,7 +68,8 @@ let makeCalcView sym a b =
     }
 
 let handleOperation operation a b stack actions =
-    let (newActions, stackPanel) = renderStackWithChange stack actions
+    let (newActions, stackPanel) = 
+        renderStackWithChange stack actions
     let innerRenderOperation showStack =
         makeBaseGrid (makeCalcView operation a b) (makeStackPanel showStack)
     innerRenderOperation stackPanel |> AnsiConsole.Write

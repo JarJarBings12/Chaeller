@@ -1,7 +1,7 @@
 ﻿module program
+
 open pda
 open vis
-
 
 [<EntryPoint>]
 let main argv =
@@ -13,12 +13,11 @@ let main argv =
             match argv[0] with
             | "step" -> Some displayReport
             | "nop" -> Some (fun stack actions -> ())
-            | a ->
-                printfn "Invalid argument: %s" a
+            | arg ->
+                printfn "Invalid argument: %s" arg
                 None
         
         let expression = parseExpression argv[1]
-
         match (validateExpression expression) with
         | [] -> 
             match handler with
@@ -32,5 +31,4 @@ let main argv =
         | a ->
             printfn "Invalid Expression: %s" argv[1]
             printfn "                    %s" (a |> Seq.map (fun i -> $"""{String.replicate i " "}^""") |> String.concat "")
-    0
-       
+    0     

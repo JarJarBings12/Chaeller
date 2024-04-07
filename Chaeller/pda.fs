@@ -16,7 +16,6 @@ type VisualizeAction<'a> =
     | Pop of 'a
     | Op of char
     | Display
-    | Clear
     
 let parseExpression input =
     let handleChar c =
@@ -61,13 +60,12 @@ let runPda expression report =
             | (stack, Error msg, actions) ->
                 Error $"Evaluation Error: {msg}"
         | InvalidInput msg::xs ->
-            Error $"Invalid Expression: "
+            Error $"Invalid Expression: {msg}"
         | [] ->
             match stack with
             | [result] -> Value result
             | [] -> Error "Evaluation Error: No element on stack"
             | _ -> Error "Evaluation Error: Invalid Expression"
-
     innerRunPda expression []   
     
 
