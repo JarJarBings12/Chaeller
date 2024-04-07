@@ -31,7 +31,7 @@ let main argv =
         | errors ->
             printfn "Invalid Expression: %s" argv[1]
             printfn 
-                "                    %s"
+                "                     %s"
                 ((expression.Length::errors, 0) 
                 ||>Seq.mapFoldBack (
                     fun state x -> 

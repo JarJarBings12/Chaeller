@@ -52,6 +52,7 @@ let runPda expression report =
 
     let rec innerRunPda expression stack =
         match expression with
+        | Space::xs -> innerRunPda xs stack 
         | Number x::xs ->
             report stack [Push x]
             innerRunPda xs (x::stack)
