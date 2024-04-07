@@ -9,6 +9,7 @@ type CalculationResult<'a> =
 type InputValue<'a> =
     | Number of 'a
     | Operator of char * ('a -> 'a -> 'a)
+    | Space
     | InvalidInput of string
  
 type VisualizeAction<'a> =
@@ -25,8 +26,10 @@ let parseExpression input =
                 match c with
                 | '*' -> Operator ('*', (*)) 
                 | '+' -> Operator ('+', (+))
+                | ' ' -> Space
                 | _ -> InvalidInput "Read invalid char"
-    input |> Seq.map handleChar |> Seq.toList
+    input |> Seq.map handleChar 
+          |> Seq.toList
 
 let validateExpression expression =
     let rec innerValidateExpression leftToCheck count errors =
@@ -59,7 +62,7 @@ let runPda expression report =
                 innerRunPda xs (result::stack)
             | (_, Error msg, _) ->
                 Error $"Evaluation Error: {msg}"
-        | InvalidInput msg::xs ->
+        | InvalidInput msg::_ ->
             Error $"Invalid Expression: {msg}"
         | [] ->
             match stack with

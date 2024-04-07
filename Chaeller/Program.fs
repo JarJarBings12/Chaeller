@@ -24,7 +24,7 @@ let main argv =
             | Some handler ->
                 let result = runPda expression handler
                 match result with
-                | Value v -> printfn "%s=%d" argv[1] v
+                | Value v -> printfn "'%s' = %d" argv[1] v
                 | Error e -> 
                     printfn "Failed to evaluate expression:\n%s" e
             | None -> ()   
