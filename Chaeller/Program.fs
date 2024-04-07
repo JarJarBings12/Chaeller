@@ -2,5 +2,35 @@
 open pda
 open vis
 
-runPda (parseExpression "11+11++") displayReport
+
+[<EntryPoint>]
+let main argv =
+    if argv.Length < 2 then
+        printfn "Expected two arguments: "
+        printfn "> chaeller [nop|step] <expression>"
+    else
+        let handler =
+            match argv[0] with
+            | "step" -> Some displayReport
+            | "nop" -> Some (fun stack actions -> ())
+            | a ->
+                printfn "Invalid argument: %s" a
+                None
         
+        let expression = parseExpression argv[1]
+
+        match (validateExpression expression) with
+        | [] -> 
+            match handler with
+            | Some handler ->
+                let result = runPda expression handler
+                match result with
+                | Value v -> printfn "%s=%d" argv[1] v
+                | Error e -> 
+                    printfn "Failed to evaluate expression:\n%s" e
+            | None -> ()   
+        | a ->
+            printfn "Invalid Expression: %s" argv[1]
+            printfn "                    %s" (a |> Seq.map (fun i -> $"""{String.replicate i " "}^""") |> String.concat "")
+    0
+       

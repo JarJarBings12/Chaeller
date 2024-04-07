@@ -29,6 +29,16 @@ let parseExpression input =
                 | _ -> InvalidInput "Read invalid char"
     input |> Seq.map handleChar |> Seq.toList
 
+let validateExpression expression =
+    let rec innerValidateExpression leftToCheck count errors =
+        match leftToCheck with
+        | InvalidInput x::xs ->
+            innerValidateExpression xs (count+1) errors@[count]
+        | x::xs -> 
+            innerValidateExpression xs (count+1) errors
+        | [] -> errors
+    innerValidateExpression expression 0 []
+
 let runPda expression report =
     let doOperation sym op stack =
         match stack with
@@ -37,7 +47,7 @@ let runPda expression report =
             (xs, Value result, [Op sym; Pop a; Pop b; Display; Push result])
         | xs ->
             (xs, Error "Stack to small or empty", [Display])
-        
+
     let rec innerRunPda expression stack =
         match expression with
         | Number x::xs ->
@@ -49,14 +59,15 @@ let runPda expression report =
                 report stack actions
                 innerRunPda xs (result::stack)
             | (stack, Error msg, actions) ->
-                printfn "%s" msg
+                Error $"Evaluation Error: {msg}"
         | InvalidInput msg::xs ->
-            printfn "%s" msg
+            Error $"Invalid Expression: "
         | [] ->
             match stack with
-            | [result] -> printfn "%s" (result |> string)
-            | [] -> printfn "Invalid Expression: No element on stack"
-            | _ -> printfn "?!"
+            | [result] -> Value result
+            | [] -> Error "Evaluation Error: No element on stack"
+            | _ -> Error "Evaluation Error: Invalid Expression"
+
     innerRunPda expression []   
     
 
