@@ -2,6 +2,7 @@
 
 open pda
 open vis
+open System.Reflection
 
 [<EntryPoint>]
 let main argv =
@@ -30,5 +31,17 @@ let main argv =
             | None -> ()   
         | a ->
             printfn "Invalid Expression: %s" argv[1]
-            printfn "                    %s" (a |> Seq.map (fun i -> $"""{String.replicate i " "}^""") |> String.concat "")
+            printfn 
+                "                    %s"
+                ((expression.Length::a, 0) 
+                ||>Seq.mapFoldBack (
+                    fun state x -> 
+                        let res = x - state
+                        (res, state + x)
+                    )
+                |> fst
+                |> Seq.rev
+                |> Seq.pairwise
+                |> Seq.map (fun (a,b) -> $"""{String.replicate (max 0 (b - a)) " "}^""") 
+                |> String.concat "")
     0     
