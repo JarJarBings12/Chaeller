@@ -12,7 +12,7 @@ type InputValue<'a> =
     | Space
     | InvalidInput of string
  
-type VisualizeAction<'a> =
+type VisualAction<'a> =
     | Push of 'a
     | Pop of 'a
     | Op of char
@@ -47,9 +47,10 @@ let runPda expression report =
         match stack with
         | a::b::xs ->
             let result = op a b
-            (xs, Value result, [Op sym; Pop a; Pop b; Display; Push result])
+            report stack [Op sym; Pop a; Pop b; Display; Push result]
+            (xs, Value result)
         | xs ->
-            (xs, Error "Stack to small or empty", [Display])
+            (xs, Error "Stack to small or empty")
 
     let rec innerRunPda expression stack =
         match expression with
@@ -60,10 +61,9 @@ let runPda expression report =
             innerRunPda xs (x::stack)
         | Operator (sym,op)::xs ->
             match (doOperation sym op stack) with
-            | (stack, Value result, actions) ->
-                report stack actions
+            | (stack, Value result) ->
                 innerRunPda xs (result::stack)
-            | (_, Error msg, _) ->
+            | (_, Error msg) ->
                 Error $"Evaluation Error: {msg}"
         | InvalidInput msg::_ ->
             Error $"Invalid Expression: {msg}"
@@ -74,4 +74,3 @@ let runPda expression report =
             | _ -> Error "Evaluation Error: Invalid Expression"
     innerRunPda expression []   
     
-

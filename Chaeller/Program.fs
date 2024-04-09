@@ -32,8 +32,8 @@ let run (args: string array) handler =
 let main args =
     let emptyReport = (fun _ _ -> ())
     match args[0] with
-    | "step" when args.Length > 2 -> run args displayReport
-    | "nop" when args.Length > 2 -> run args emptyReport
+    | "step" when args.Length >= 2 -> run args displayReport
+    | "nop" when args.Length >= 2 -> run args emptyReport
     | "test" ->
         printfn "3 4 + 6 2 + 8 9 + 4 3 + * * *"
         run [| "nop"; "3 4 + 6 2 + 8 9 + 4 3 + * * *" |] emptyReport
