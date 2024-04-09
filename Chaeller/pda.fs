@@ -41,6 +41,7 @@ let validateExpression expression =
         | [] -> errors
     innerValidateExpression expression 0 []
 
+[<TailCall>]
 let runPda expression report =
     let doOperation sym op stack =
         match stack with
@@ -52,7 +53,8 @@ let runPda expression report =
 
     let rec innerRunPda expression stack =
         match expression with
-        | Space::xs -> innerRunPda xs stack 
+        | Space::xs -> 
+            innerRunPda xs stack 
         | Number x::xs ->
             report stack [Push x]
             innerRunPda xs (x::stack)
